@@ -12,6 +12,8 @@
             background: radial-gradient(circle at top left, #1e293b, #0f172a);
             color: #f8fafc;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.03);
@@ -36,26 +38,33 @@
         }
         .btn-calculate {
             background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
-            transition: all 0.3s transform;
+            transition: all 0.3s ease;
             box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
         }
         .btn-calculate:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 25px rgba(99, 102, 241, 0.4);
+            filter: brightness(1.1);
         }
         .highlight-marker {
             background: #6366f1;
-            padding: 2px 10px;
-            border-radius: 6px;
+            padding: 4px 12px;
+            border-radius: 8px;
             font-weight: bold;
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+        footer {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.4);
         }
     </style>
 </head>
 <body class="p-4 md:p-10">
 
-    <div class="max-w-6xl mx-auto">
-        <!-- Header Section -->
+    <div class="max-w-6xl mx-auto w-full">
         <header class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-2">Maternal markers Test Finder</h1>
             <p class="text-indigo-400 text-lg uppercase tracking-widest font-medium">Fetus Gestational Age & Marker Test</p>
@@ -63,11 +72,10 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <!-- Input Panel -->
             <div class="lg:col-span-2 glass-card p-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     <div class="space-y-5">
-                        <h3 class="text-indigo-300 font-semibold border-b border-white/10 pb-2">Step 1: Dates</h3>
+                        <h3 class="text-indigo-300 font-semibold border-b border-white/10 pb-2">Step 1: Clinical Dates</h3>
                         <div>
                             <label class="text-xs uppercase opacity-60 block mb-1">USG Report Date</label>
                             <input type="date" id="usgDate" class="input-field">
@@ -79,32 +87,30 @@
                     </div>
 
                     <div class="space-y-5">
-                        <h3 class="text-indigo-300 font-semibold border-b border-white/10 pb-2">Step 2: Measurements</h3>
+                        <h3 class="text-indigo-300 font-semibold border-b border-white/10 pb-2">Step 2: Scan Parameters</h3>
                         <div>
                             <label class="text-xs uppercase opacity-60 block mb-1">CRL Value (mm)</label>
-                            <input type="number" step="0.1" id="crlValue" placeholder="2.2 - 85.0" class="input-field">
+                            <input type="number" step="0.1" id="crlValue" placeholder="e.g. 2.2 - 85.0" class="input-field">
                         </div>
                         <div>
                             <label class="text-xs uppercase opacity-60 block mb-1">BPD Value (mm)</label>
-                            <input type="number" step="0.1" id="bpdValue" placeholder="15.0 - 55.3" class="input-field">
+                            <input type="number" step="0.1" id="bpdValue" placeholder="e.g. 15.0 - 55.3" class="input-field">
                         </div>
                     </div>
                 </div>
 
-                <!-- Action Button -->
                 <button onclick="processData()" class="btn-calculate w-full py-4 rounded-xl text-lg font-bold uppercase tracking-wider mb-8">
-                    Calculate Marker Test
+                    Calculate Marker Suitability
                 </button>
 
-                <!-- Hidden Results Section -->
-                <div id="resultsSection" class="hidden animate-fade-in">
+                <div id="resultsSection" class="hidden">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-white/5 p-4 rounded-xl border border-white/10">
                             <span class="text-xs opacity-50 block">USG REPORT GEST. AGE</span>
                             <span id="usgGA_Display" class="text-2xl font-bold text-white">--</span>
                         </div>
                         <div class="bg-indigo-500/10 p-4 rounded-xl border border-indigo-500/20">
-                            <span class="text-xs text-indigo-300 block">TOTAL GA AT COLLECTION</span>
+                            <span class="text-xs text-indigo-300 block">GA AT SAMPLE COLLECTION</span>
                             <span id="totalGA_Display" class="text-2xl font-bold text-indigo-400">--</span>
                         </div>
                     </div>
@@ -115,36 +121,39 @@
                 </div>
             </div>
 
-            <!-- Right Sidebar: Smart Info -->
             <div class="space-y-6">
-                <!-- Smart Marker Display -->
-                <div class="glass-card p-6 border-t-4 border-indigo-500 shadow-indigo-500/20">
-                    <h3 class="text-sm font-bold text-indigo-300 uppercase mb-4">Recommended Marker</h3>
+                <div class="glass-card p-6 border-t-4 border-indigo-500">
+                    <h3 class="text-xs font-bold text-indigo-300 uppercase mb-4 tracking-tighter">Recommended Test</h3>
                     <div id="markerName" class="text-xl font-bold leading-tight mb-2 text-white">
-                        Awaiting Calculation...
+                        Enter data to see test recommendation
                     </div>
                     <div id="markerAlert" class="text-sm text-yellow-200/80 italic"></div>
                 </div>
 
-                <!-- Requirements -->
                 <div class="glass-card p-6">
-                    <h3 class="text-sm font-bold text-white uppercase mb-4">Required Details</h3>
+                    <h3 class="text-sm font-bold text-white uppercase mb-4">Required Documents</h3>
                     <ul class="text-sm space-y-3 opacity-80">
-                        <li>• Date of Birth (DOB)</li>
-                        <li>• Current Weight</li>
-                        <li>• Complete USG Report</li>
+                        <li class="flex items-center gap-2"><span>•</span> DOB & Current Weight</li>
+                        <li class="flex items-center gap-2"><span>•</span> Complete USG Report</li>
                     </ul>
                     <hr class="my-5 border-white/10">
-                    <div class="text-xs space-y-2">
-                        <p class="text-red-400 font-semibold italic">Note: Conducting marker tests during the initial weeks carries a higher risk of false positives. Consequently, the department may request a repeat sample and more detailed clinical history.</p>
+                    <div class="text-xs">
+                        <p class="text-red-400 font-semibold mb-2">Note: In early weeks, chances of false positive results are higher. Repeat sample may be required.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <footer>
+        <div class="max-w-6xl mx-auto px-4">
+            <p>© 2026 Anup Kumar A. Mishra | All Rights Reserved</p>
+            <p class="mt-1 font-semibold text-indigo-300/60">Created by - Anup Kumar A. Mishra</p>
+        </div>
+    </footer>
+
     <script>
-        // Reference Data from
+        // Data from reference file 
         const crlTable = [
             {range:[2.2,2.5], w:5, d:1}, {range:[2.6,2.9], w:5, d:2}, {range:[3,3.3], w:5, d:3}, {range:[3.4,3.8], w:5, d:4}, {range:[3.9,4.3], w:5, d:5}, {range:[4.4,4.8], w:5, d:6},
             {range:[4.9,5.4], w:6, d:0}, {range:[5.5,6.0], w:6, d:1}, {range:[6.1,6.6], w:6, d:2}, {range:[6.7,7.3], w:6, d:3}, {range:[7.4,7.9], w:6, d:4}, {range:[8,8.7], w:6, d:5}, {range:[8.8,9.4], w:6, d:6},
@@ -195,14 +204,14 @@
 
             if (!data) {
                 errorBox.classList.remove('hidden');
-                markerName.innerText = "Error";
+                markerName.innerText = "Value Missing or Out of Range";
                 return;
             }
 
             errorBox.classList.add('hidden');
             document.getElementById('usgGA_Display').innerText = data.w + "W " + data.d + "D";
 
-            // Calculation Logic
+            // Gestational Age logic 
             const timeDiff = Math.abs(cDate - uDate);
             const extraDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
             const totalDays = (data.w * 7) + data.d + extraDays;
@@ -212,25 +221,25 @@
 
             document.getElementById('totalGA_Display').innerText = finalW + "W " + finalD + "D";
 
-            // Marker & Smart Message Logic
+            // Test Rule Logic 
             let name = "";
             let alertMsg = "";
 
             if (finalW >= 8 && decimalW <= 14.0) {
                 name = "DUAL MARKER";
-                if (decimalW >= 11.0) alertMsg = "📢 NT/NB SCAN REPORT IS NEEDED.";
+                if (decimalW >= 11.0) alertMsg = "📢 NT/NB SCAN REPORT IS MANDATORY.";
             } 
             else if (decimalW >= 15.0 && decimalW <= 17.0) {
                 name = "<span class='highlight-marker'>TRIPLE MARKER</span> / QUAD MARKER";
-                alertMsg = "Triple Marker is highly recommended.";
+                alertMsg = "Triple Marker is highlighted/recommended.";
             }
             else if (decimalW > 17.0 && decimalW <= 22.6) {
                 name = "TRIPLE MARKER / <span class='highlight-marker'>QUAD MARKER</span>";
-                alertMsg = "Quadruple Marker is preferred now.";
+                alertMsg = "Quadruple Marker is highlighted/recommended.";
                 if (decimalW >= 16.0) alertMsg += " 📢 LEVEL-II USG REPORT NEEDED.";
             } else {
-                name = "OUT OF RANGE";
-                alertMsg = "Consult customer care for options.";
+                name = "OUT OF WINDOW";
+                alertMsg = "Please contact customer care.";
             }
 
             markerName.innerHTML = name;
